@@ -40,7 +40,7 @@ void main() {
       return Response(json.encode([1, 2, 3, 4]), 200);
     });
 
-    final List ids = await apiProvider.fetchTopIds();
+    final List<int> ids = await apiProvider.fetchTopIds();
 
     expect(ids, [1, 2, 3, 4]);
   });
