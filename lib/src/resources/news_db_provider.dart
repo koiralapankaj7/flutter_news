@@ -7,6 +7,9 @@ import '../models/item_model.dart';
 
 class NewsDbProvider {
   Database db; // Sqflite lib
+  final String _dbName = "items.db";
+  final int _dbVersion = 1;
+  final String _table = "Items"; // Table name
 
   /*
    * Inside our constructor we cannot have asynchronous logic.
@@ -24,9 +27,11 @@ class NewsDbProvider {
      */
     // Getting documents directory from mobile device
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
+
     // Path for database
-    final String path = join(documentsDirectory.path, 'items.db');
-    db = await openDatabase(path, version: 1,
+    final String path = join(documentsDirectory.path, _dbName);
+
+    db = await openDatabase(path, version: _dbVersion,
         onCreate: (Database newDb, int version) {
       // For multi line string we have to use tripple quotes
       // WE DO NOT HAVE ANY SPECIFIC DATA TYPE TO STORE LIST ITEM IN DATABASE.
@@ -34,7 +39,7 @@ class NewsDbProvider {
       // THERE IS NO BOOLEAN DATA TYPE IN SQFLITE DATABASE. SO WE ARE USING INTEGER INSTED OF BOOLEAN.
       // 1 MEANS TRUE AND 0 MEANS FALSE. WILL HANDLE THIS LOGIC LATER.
       newDb.execute("""
-            CREATE TABLE Items
+            CREATE TABLE $_table
             (
               id INTEGER PRIMARY KEY,
               type TEXT,
@@ -52,5 +57,42 @@ class NewsDbProvider {
             )
           """);
     });
+  }
+
+  Future<ItemModel> fetchItem(int id) async {
+    //
+    // Column is set as null because we want to fetch entire items. If we need any specific item then we can
+    // use columns : ["item name"] to get single item.
+    final List<Map<String, dynamic>> maps = await db.query(
+      //
+      // table name
+      _table,
+
+      // Fetch all columns i.e items
+      columns: null,
+
+      // ? means something we are gonna pass as argument to the query
+      // Question mark will be replaced by first element of the whereArgs list.
+      where: "id = ?",
+
+      // Passing id as a argument to the query.
+      // This mechanisum is used to protect sql injection.
+      whereArgs: [id],
+      //
+    );
+
+    // We know we will get either 1 or 0 map from the db but db.query() will return us list of maps.
+    // That is why we are using maps.first to get first map element from the list.
+    if (maps.length > 0) {
+      return ItemModel.fromDb(maps.first);
+    }
+
+    return null;
+  }
+
+  // Add item in local database
+  // We are not waiting for completion of inseration process which is the reason we didnot specify async in this method
+  Future<int> addItem(ItemModel item) {
+    return db.insert(_table, item.toMap());
   }
 }
