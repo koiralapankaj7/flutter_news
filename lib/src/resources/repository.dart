@@ -7,7 +7,7 @@ class Repository {
   //
   List<Source> sources = <Source>[
     newsDbProvider, // We have created an object in NewsDbProvider class
-    NewsDbProvider(),
+    NewsApiProvider(),
   ];
 
   List<Cache> caches = <Cache>[
