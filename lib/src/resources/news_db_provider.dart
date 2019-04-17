@@ -4,12 +4,17 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'dart:async';
 import '../models/item_model.dart';
+import 'repository.dart';
 
-class NewsDbProvider {
+class NewsDbProvider implements Source, Cache {
   Database db; // Sqflite lib
   final String _dbName = "items.db";
   final int _dbVersion = 1;
   final String _table = "Items"; // Table name
+
+  NewsDbProvider() {
+    init();
+  }
 
   /*
    * Inside our constructor we cannot have asynchronous logic.
@@ -59,6 +64,7 @@ class NewsDbProvider {
     });
   }
 
+  @override
   Future<ItemModel> fetchItem(int id) async {
     //
     // Column is set as null because we want to fetch entire items. If we need any specific item then we can
@@ -90,9 +96,22 @@ class NewsDbProvider {
     return null;
   }
 
+  // Todo - store and fetch top ids
+  @override
+  Future<List<int>> fetchTopIds() {
+    return null;
+  }
+
   // Add item in local database
   // We are not waiting for completion of inseration process which is the reason we didnot specify async in this method
+  @override
   Future<int> addItem(ItemModel item) {
     return db.insert(_table, item.toMap());
   }
 }
+
+// To avoid multiple object creation we are creating object here itself.
+// Now all the classes that need to create an object of this class will call this.
+// In this way we can prevent from creating multiple object.
+// Main reason behind doing this is restecting user from opening multiple connection to same database.
+final newsDbProvider = NewsDbProvider();

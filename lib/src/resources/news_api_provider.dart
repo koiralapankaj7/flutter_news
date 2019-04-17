@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' show Client, Response;
 import '../models/item_model.dart';
+import 'repository.dart';
 
 final String _rootUrl = 'https://hacker-news.firebaseio.com/v0';
 
-class NewsApiProvider {
+class NewsApiProvider implements Source {
   Client client = Client();
 
+  @override
   Future<List<int>> fetchTopIds() async {
     final Response response = await client.get('$_rootUrl/topstories.json');
 
@@ -19,6 +21,7 @@ class NewsApiProvider {
     return ids.cast<int>();
   }
 
+  @override
   Future<ItemModel> fetchItem(int id) async {
     final Response response = await client.get('$_rootUrl/item/$id.json');
     final Map<String, dynamic> parsedJson = json.decode(response.body);
