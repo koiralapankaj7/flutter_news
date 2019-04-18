@@ -18,14 +18,14 @@ class ItemModel {
   // This named constructor will be used by api provider class to map and store data fetched from the API.
   ItemModel.fromJson(Map<String, dynamic> parsedJson)
       : id = parsedJson['id'],
-        deleted = parsedJson['deleted'],
+        deleted = parsedJson['deleted'] ?? false, // if null set false
         type = parsedJson['type'],
         by = parsedJson['by'],
         time = parsedJson['time'],
-        text = parsedJson['text'],
-        dead = parsedJson['dead'],
+        text = parsedJson['text'] ?? '',
+        dead = parsedJson['dead'] ?? false,
         parent = parsedJson['parent'],
-        kids = parsedJson['kids'],
+        kids = parsedJson['kids'] ?? [],
         url = parsedJson['url'],
         score = parsedJson['score'],
         title = parsedJson['title'],

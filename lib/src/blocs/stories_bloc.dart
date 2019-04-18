@@ -6,22 +6,24 @@ class StoriesBloc {
   final Repository _repository = Repository();
 
   // PublishSubject = StreamController
-  final PublishSubject _topIds = PublishSubject<List<int>>();
+  final PublishSubject<List<int>> _topIds = PublishSubject();
 
-  final BehaviorSubject _items = BehaviorSubject<int>();
+  final BehaviorSubject<Map<int, Future<ItemModel>>> _itemsOutput =
+      BehaviorSubject();
 
-  Observable<Map<int, Future<ItemModel>>> items;
+  final PublishSubject<int> _itemFetcher = PublishSubject();
 
   // Getters to stream
-  Observable<List<int>> get getTopIds => _topIds.stream; // Observable = Stream
+  Observable<List<int>> get topIds => _topIds.stream; // Observable = Stream
+  Observable<Map<int, Future<ItemModel>>> get items => _itemsOutput.stream;
 
   // Getters to sink
-  Function(int) get fetchItem => _items.sink.add;
+  Function(int) get fetchItem => _itemFetcher.sink.add;
 
   StoriesBloc() {
-    // To apply transformer exactly one time we have done this way.
-    // If we apply transformer multiple time it will be ended up by creating seperate cache.
-    items = _items.stream.transform(_itemsTransformer());
+    //pipe will get event from itemFetcher and transfer event to itemsOutput
+    // Before transfering event to itemsOutput, itemFetcher event will be go through transformer
+    _itemFetcher.stream.transform(_itemsTransformer()).pipe(_itemsOutput);
   }
 
   /*
@@ -50,6 +52,7 @@ class StoriesBloc {
 
   void dispose() {
     _topIds.close();
-    _items.close();
+    _itemsOutput.close();
+    _itemFetcher.close();
   }
 }
