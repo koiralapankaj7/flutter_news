@@ -31,11 +31,16 @@ class StoriesBloc {
    * Repository is responsible for callig/changing data that is why to hide sink function 
    * from widgets we made function instead of getter for sink. 
    */
-  void fetchTopIds() async {
+  Future fetchTopIds() async {
     // Getting ids from repository
     final List<int> ids = await _repository.fetchTopIds();
     // Adding ids to sink
     _topIds.sink.add(ids);
+    print('Fetched top ids..');
+  }
+
+  clearCache() {
+    return _repository.clearCache();
   }
 
   // this will take id as a parameter then fetch item for that id. After that it will add both

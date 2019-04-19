@@ -108,6 +108,13 @@ class NewsDbProvider implements Source, Cache {
   Future<int> addItem(ItemModel item) {
     return db.insert(_table, item.toMap());
   }
+
+  // Remove all data from table in database
+  @override
+  Future<int> clear() {
+    print("Delete table from database");
+    return db.delete(_table);
+  }
 }
 
 // To avoid multiple object creation we are creating object here itself.
