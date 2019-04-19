@@ -29,7 +29,7 @@ class ItemModel {
         url = parsedJson['url'],
         score = parsedJson['score'],
         title = parsedJson['title'],
-        descendants = parsedJson['descendants'];
+        descendants = parsedJson['descendants'] ?? 0;
 
   /*
    * This named constructor will be used by db provider class to map and store data fetched from the local db.
