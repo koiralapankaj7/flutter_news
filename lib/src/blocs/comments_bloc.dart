@@ -27,15 +27,23 @@ class CommentsBloc {
     return ScanStreamTransformer<int, Map<int, Future<ItemModel>>>(
       (cache, int id, int index) {
         //Fetch ItemModel of id from repository and add into cache map
+        // Fetch Future of item model from repository and assign to cache map
         cache[id] = _repository.fetchItem(id);
-        // As soon as this (cache[id]) future resoulves as ItemModel that we are trying to fetch.
-        // Function inside then((){}) will be invoked.
+
+        /*
+         *  cache[id] => Reference back to the cache map and we will get the future we just map there
+         *  And we chain on .then statement
+         *  Inner functiion of .then will be invoked whenever that future finally get its ItemModel from the repository.
+         */
         cache[id].then((ItemModel item) {
           // Loop through kids in ItemModel then add/sink each kid id to fetchItemWithComments function
           // This kid id will be processed by _commentsFetcher Subject/Controller by transfering into
           // _commentsTransofrmer
+          // This is recursive data fetching concept
           item.kids.forEach((kidId) => fetchItemWithComments(kidId));
         });
+
+        return cache;
       },
       // Cache map
       <int, Future<ItemModel>>{},
