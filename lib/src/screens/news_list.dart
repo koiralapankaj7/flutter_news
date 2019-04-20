@@ -4,19 +4,23 @@ import '../widgets/news_list_tile.dart';
 import '../widgets/refresh.dart';
 
 class NewsList extends StatelessWidget {
+  final StoriesBloc bloc;
+
+  NewsList({this.bloc});
+
   @override
   Widget build(BuildContext context) {
-    final StoriesBloc bloc = StoriesProvider.of(context);
-    bloc.fetchTopIds();
+    //final StoriesBloc bloc = StoriesProvider.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Top News'),
       ),
-      body: buildList(bloc),
+      body: buildList(),
     );
   }
 
-  Widget buildList(StoriesBloc bloc) {
+  Widget buildList() {
     return StreamBuilder(
       stream: bloc.topIds,
       builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
